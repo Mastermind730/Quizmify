@@ -7,44 +7,49 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id                    String     @id @default(uuid())
+  name                  String
+  email                 String?    @unique
+  emailVerified         DateTime?   @map("email_verified")
+  image                 String?
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  accounts              Account[]
+  sessions              Session[]
+  @@map("users")
+}
 model Account {
   id                 String    @id @default(cuid())
-  userId             String
-  providerType       String
-  providerId         String
-  providerAccountId  String
-  refreshToken       String?
-  accessToken        String?
-  accessTokenExpires DateTime?
+  userId              String    @map("user_id")
+  type                 String?
+  provider           String
+  providerAccountId  String    @map("provider_account_id")
+  token_type         String?
+  refresh_token      String?   
+  access_token       String?   
+  expires_at         Int?
+  scope              String?
+  id_token           String? 
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
-  user               User      @relation(fields: [userId], references: [id])
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([providerId, providerAccountId])
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
 }
 
 model Session {
   id           String   @id @default(cuid())
-  userId       String
+  userId       String?  @map("user_id")
+  sessionToken String    @map("session_token") @unique
+  accessToken  String?   @map("access_token")
   expires      DateTime
-  sessionToken String   @unique
-  accessToken  String   @unique
+  user         User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  user         User     @relation(fields: [userId], references: [id])
-  @@index([userId],name:"userId")
-}
 
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
+  @@map("sessions")
 }
 
 model VerificationRequest {
