@@ -39,9 +39,10 @@ export const authOptions: NextAuthOptions = {
             },
           });
           if (dbUser) {
+            // console.log(dbUser);
             token.id = dbUser.id;
             token.name = dbUser.name; // Example: Fetch additional user details
-            token.picture = dbUser.picture; // Example: Fetch additional user details
+            token.picture = dbUser.image ? dbUser.image : ''; ; // Example: Fetch additional user details
           }
         }
       } catch (error) {
@@ -52,6 +53,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       try {
         if (token) {
+          // console.log(token)
           session.user.id = token.id;
           session.user.name = token.name;
           session.user.email = token.email;
