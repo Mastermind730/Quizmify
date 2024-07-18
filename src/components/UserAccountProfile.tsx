@@ -38,7 +38,7 @@ const UserAccountProfile: React.FC<UserAccountProfileProps> = ({ user }) => {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href={"/"}>Hallo!</Link>
+          <Link className="dark:text-white" href={"/"}>Hallo!</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
