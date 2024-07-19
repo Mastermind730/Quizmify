@@ -17,6 +17,7 @@ model User {
   updatedAt             DateTime   @updatedAt
   accounts              Account[]
   sessions              Session[]
+  Game                   Game[]
   @@map("users")
 }
 model Account {
@@ -61,4 +62,38 @@ model VerificationRequest {
   updatedAt  DateTime @updatedAt
 
   @@unique([identifier, token])
+}
+
+
+enum GameType{
+  mcq
+  open_ended
+}
+
+model Game{
+ id          String    @id @default(cuid())
+  userId      String
+  timeStarted DateTime  
+  topic       String
+  timeEnded   DateTime?
+  gameType    GameType
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questions Question[]
+  @@index([userId],name:"userId")
+}
+
+
+model Question{
+  id String @id @default(cuid())
+  question String
+  answer String
+  gameId String
+  options Json? ///only for mcq questions
+  percentageCorrect Float? //for open ended questions
+  isCorrect Boolean? ///for mcq questions only
+  questionType GameType
+  userAnswer String?
+
+  game Game @relation(fields: [gameId],references: [id],onDelete: Cascade)
+  @@index([gameId],name:"gameId")
 }
