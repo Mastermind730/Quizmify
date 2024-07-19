@@ -11,7 +11,7 @@ export const POST = async (req: Request) => {
 
     let questions: any;
     if (type === "open_ended") {
-      const prompt = `You are a helpful AI that is able to generate a pair of questions and answers. The length of the answer should not exceed 15 words. Store all the pairs of answers and questions in a JSON array. You are to generate a random hard open-ended question about ${topic}.`;
+      const prompt = `You are a helpful AI that is able to generate pairs of questions and answers. The length of each answer should not exceed 15 words. Store all the pairs of questions and answers in a JSON array. You are to generate ${amount} random hard open-ended questions about ${topic}. Each entry in the JSON array should be of the format: {"question": "Your question here", "answer": "Your answer here"}.`;
         console.log("request going to send now")
       // Start the chat session and send the prompt
       const chat = await chatSession.sendMessage(prompt);
@@ -33,6 +33,23 @@ export const POST = async (req: Request) => {
       questions = JSON.parse(jsonDataString);
     //   console.log(questions)
     // questions=[]
+    }else if(type==="mcq"){
+      const prompt = `You are a helpful AI that is able to generate multiple-choice questions (MCQs) and answers. Each question should be in the following JSON format:
+      {
+        "question": "The question text",
+        "answer": "The correct answer",
+        "option1": "First option",
+        "option2": "Second option",
+        "option3": "Third option",
+        "option4": "Fourth option"
+      }
+      Generate ${amount} MCQs on the topic of ${topic}. Ensure that the correct answer is one of the options and the length of the answer does not exceed 15 words.`;        console.log("request going to send now")
+      // Start the chat session and send the prompt
+      const chat = await chatSession.sendMessage(prompt);
+      let responseText = await chat.response.text();
+      responseText = responseText.replace('```json', '').replace('```', '').trim();
+      console.log(responseText)
+      questions = JSON.parse(responseText);
     }
     return NextResponse.json({ questions }, { status: 200 });
   } catch (error: any) {
