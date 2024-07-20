@@ -48,14 +48,34 @@ export async function POST(req:Request,res:Response){
                 question:question.question,
                 answer:question.answer,
                 options:JSON.stringify(options),
-                gameId:
+                gameId:game.id,
+                questionType:"mcq"
             }
            })
-           await prisma.question.create({
+           await prisma.question.createMany({
             data:manyData
            }) 
         }
-
+        else if(type==="open_ended"){
+            type openEndedQuestion={
+                question:string,
+                answer:string,
+            }
+            let manyData=data.questions.map((question:openEndedQuestion)=>{
+                return{
+                    question:question.question,
+                    answer:question.answer,
+                    gameId:game.id,
+                    questionType:"open_ended"
+                }
+            })
+            await prisma.question.createMany({
+                data:manyData
+            })
+        }
+return NextResponse.json({
+    gameId:game.id
+})
 
     } catch (error:any) {
         if (error instanceof ZodError) {
