@@ -61,7 +61,7 @@ const QuizCreation = (props: Props) => {
       type:input.type,
     },{
       onSuccess:({gameId})=>{
-        if(form.getValues("type")=="open_ended")
+        if(form.getValues("type")=="mcq")
           router.push(`/play/mcq/${gameId}`)
         else
         router.push(`/play/open-ended/${gameId}`)

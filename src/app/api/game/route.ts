@@ -42,7 +42,7 @@ export async function POST(req:Request,res:Response){
                 option4:string,
             }
            let manyData=data.questions.map((question:mcqQuestion)=>{
-            let options=[question.answer,question.option1,question.option2,question.option3,question.option4];
+            let options=[question.option1,question.option2,question.option3,question.option4];
             options=options.sort(()=>Math.random()-.5)
             return{
                 question:question.question,
@@ -81,6 +81,7 @@ return NextResponse.json({
         if (error instanceof ZodError) {
             return NextResponse.json({ error: error.issues }, { status: 400 });
           }
+          console.log(error.message)
           return NextResponse.json({
             error:"Something went wrong"
           },{status:500})
