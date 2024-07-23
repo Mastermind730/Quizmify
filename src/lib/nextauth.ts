@@ -24,6 +24,7 @@ declare module "next-auth/jwt" {
   }
 }
 
+
 // Configure NextAuth options
 export const authOptions: NextAuthOptions = {
   session: {
@@ -65,6 +66,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+  
   secret: process.env.NEXT_AUTH_SECRET,
   adapter: PrismaAdapter(prisma),
   providers: [
