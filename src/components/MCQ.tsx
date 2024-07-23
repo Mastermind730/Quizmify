@@ -11,23 +11,34 @@ import { checkAnswerSchema } from "@/schemas/form/quiz";
 import axios from "axios";
 import { useToast } from "./ui/use-toast";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, formatTimeDelta } from "@/lib/utils";
+import { differenceInSeconds } from "date-fns";
 
 type Props = {
   game: Game & { questions: Pick<Question, "id" | "options" | "question">[] };
 };
 
 const MCQ = ({ game }: Props) => {
- 
   const [questionIndex, setquestionIndex] = useState(0);
   const [hasEnded, sethasEnded] = useState<boolean>(false);
   const [selectedChoice, setSelectedChoice] = useState<number>(0);
   const [correctAnswers, setcorrectAnswers] = useState<number>(0);
   const [wrongAnswers, setwrongAnswers] = useState<number>(0);
+  const [now, setNow] = useState<Date>(new Date());
   const currentQuestion = useMemo(() => {
     return game.questions[questionIndex];
   }, [game.questions, questionIndex]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!hasEnded) {
+        setNow(new Date());
+      }
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  });
   const { toast } = useToast();
   const options = useMemo(() => {
     if (!currentQuestion) return [];
@@ -64,14 +75,14 @@ const MCQ = ({ game }: Props) => {
           });
           setwrongAnswers((prev) => prev + 1);
         }
-        if(questionIndex===game.questions.length-1){
-          sethasEnded(true)
+        if (questionIndex === game.questions.length - 1) {
+          sethasEnded(true);
           return;
         }
         setquestionIndex((prev) => prev + 1);
       },
     });
-  }, [checkAnswer, toast, isChecking,game.questions.length,questionIndex]);
+  }, [checkAnswer, toast, isChecking, game.questions.length, questionIndex]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -91,19 +102,23 @@ const MCQ = ({ game }: Props) => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  },[handleNext]);
+  }, [handleNext]);
 
-  if(hasEnded){
+  if (hasEnded) {
     <div className="absolute flex flex-col justify-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-<div className="px-4 mt-2 font-semibold-text-white bg-green-500 rounded-md whitespace-nowrap">
-  You completed in 3min 4s
-</div>
+      <div className="px-4 mt-2 font-semibold-text-white bg-green-500 rounded-md whitespace-nowrap">
+        You completed in{" "}
+        {formatTimeDelta(differenceInSeconds(now, game.timeStarted))}
+      </div>
 
-<Link href={`/statistics/${game.id}`} className={cn(buttonVariants(),"mt-2")}>
-View Statistics
-<BarChart className="w-4 h-4 ml-2"/>
-</Link>
-    </div>
+      <Link
+        href={`/statistics/${game.id}`}
+        className={cn(buttonVariants(), "mt-2")}
+      >
+        View Statistics
+        <BarChart className="w-4 h-4 ml-2" />
+      </Link>
+    </div>;
   }
 
   return (
@@ -118,10 +133,14 @@ View Statistics
           </p>
           <div className="flex self-start mt-3 text-slate-400">
             <Timer className="mr-2" />
+            {formatTimeDelta(differenceInSeconds(now, game.timeStarted))}
             <span>00:00</span>
           </div>
         </div>
-        <MCQCounter correctAnswers={correctAnswers} wrongAnswers={wrongAnswers} />
+        <MCQCounter
+          correctAnswers={correctAnswers}
+          wrongAnswers={wrongAnswers}
+        />
       </div>
       <Card className="w-full mt-4">
         <CardHeader className="flex flex-row items-center">
@@ -158,7 +177,7 @@ View Statistics
           onClick={() => handleNext()}
           className="mt-2"
         >
-          {isChecking&&<Loader2 className="w-4 h-4 mr-2 animate-spin"/>}
+          {isChecking && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
           Next <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
