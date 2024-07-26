@@ -5,6 +5,9 @@ import prisma from "@/lib/prismadb";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { LucideLayoutDashboard } from "lucide-react";
+import ResultsCard from "@/components/statistics/ResultsCard";
+import AccuracyCard from "@/components/statistics/AccuracyCard";
+import TimeTakenCard from "@/components/statistics/TimeTakenCard";
 type Props = {
   params: {
     gameId: string;
@@ -37,9 +40,9 @@ const StatisticsPage = async ({ params: { gameId } }: Props) => {
           </div>
         </div>
         <div className="grid gap-4 mt-4 md:grid-cols-7">
-{/* <ResultsCard/> */}
-{/* <AccuracyCard/> */}
-{/* <TimeTakenCard/> */}
+<ResultsCard accuracy={80}/>
+<AccuracyCard accuracy={80}/>
+<TimeTakenCard timeEnded={new Date()} timeStarted={new Date()}/>
         </div>
         {/* <QuestionsList/> */}
       </div>
