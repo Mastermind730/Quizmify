@@ -8,6 +8,7 @@ import { LucideLayoutDashboard } from "lucide-react";
 import ResultsCard from "@/components/statistics/ResultsCard";
 import AccuracyCard from "@/components/statistics/AccuracyCard";
 import TimeTakenCard from "@/components/statistics/TimeTakenCard";
+import QuestionsList from "@/components/statistics/QuestionsList";
 type Props = {
   params: {
     gameId: string;
@@ -64,7 +65,7 @@ const StatisticsPage = async ({ params: { gameId } }: Props) => {
           <AccuracyCard accuracy={accuracy} />
           <TimeTakenCard timeEnded={new Date()} timeStarted={game.timeStarted} />
         </div>
-        {/* <QuestionsList/> */}
+        <QuestionsList questions={game.questions}/>
       </div>
     </>
   );

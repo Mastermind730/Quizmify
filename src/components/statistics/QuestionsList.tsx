@@ -9,13 +9,15 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { cn } from "@/lib/utils";
 
 type Props = {
   questions: Question[];
 };
 
 const QuestionsList = ({ questions }: Props) => {
-  let gameType = questions[0].questionType;
+  const gameType = questions[0]?.questionType || "mcq"; // Default to "mcq" if questionType is not defined
+
   return (
     <Table className="mt-4">
       <TableCaption>End of List.</TableCaption>
@@ -30,20 +32,35 @@ const QuestionsList = ({ questions }: Props) => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <>
-          {questions.map((question, index) => {
-            <TableRow key={question.id}>
-              <TableCell className="font-medium">{index + 1}</TableCell>
-              <TableCell>
-                {question.question}
-                <br />
-                <br />
-                <span className="font-semibold">{question.answer}</span>
+        {questions.map((question, index) => (
+          <TableRow key={question.id}>
+            <TableCell className="font-medium">{index + 1}</TableCell>
+            <TableCell>
+              {question.question}
+              <br />
+              <br />
+              <span className="font-semibold">{question.answer}</span>
+            </TableCell>
+            {gameType === "mcq" && (
+              <TableCell
+                className={cn({
+                  "text-green-600": question.isCorrect,
+                  "text-red-600": !question.isCorrect,
+                })}
+              >
+                {question.userAnswer}
               </TableCell>
-              
-            </TableRow>;
-          })}
-        </>
+            )}
+            {gameType === "open_ended" && (
+              <>
+                <TableCell>{question.userAnswer}</TableCell>
+                <TableCell className="text-right">
+                  {question.percentageCorrect}
+                </TableCell>
+              </>
+            )}
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   );

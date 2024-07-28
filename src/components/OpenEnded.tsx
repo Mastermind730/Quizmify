@@ -72,7 +72,7 @@ const OpenEnded = ({ game }: Props) => {
         }
       },
     });
-  }, [checkAnswer, toast, blankAnswers, isChecking, game.questions.length, questionIndex]);
+  }, [checkAnswer, toast, isChecking, game.questions.length, questionIndex]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

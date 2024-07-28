@@ -19,11 +19,11 @@ type Props = {
 };
 
 const MCQ = ({ game }: Props) => {
-  const [questionIndex, setquestionIndex] = useState(0);
-  const [hasEnded, sethasEnded] = useState<boolean>(false);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [hasEnded, setHasEnded] = useState<boolean>(false);
   const [selectedChoice, setSelectedChoice] = useState<number>(0);
-  const [correctAnswers, setcorrectAnswers] = useState<number>(0);
-  const [wrongAnswers, setwrongAnswers] = useState<number>(0);
+  const [correctAnswers, setCorrectAnswers] = useState<number>(0);
+  const [wrongAnswers, setWrongAnswers] = useState<number>(0);
   const [now, setNow] = useState<Date>(new Date());
   const currentQuestion = useMemo(() => {
     return game.questions[questionIndex];
@@ -38,14 +38,15 @@ const MCQ = ({ game }: Props) => {
     return () => {
       clearInterval(interval);
     };
-  });
+  }, [hasEnded]);
+
   const { toast } = useToast();
   const options = useMemo(() => {
     if (!currentQuestion) return [];
     return JSON.parse(currentQuestion.options as string) as string[];
   }, [currentQuestion]);
 
-  const { mutate: checkAnswer, isPending: isChecking } = useMutation({
+  const { mutate: checkAnswer, isLoading: isChecking } = useMutation({
     mutationFn: async () => {
       const payload: z.infer<typeof checkAnswerSchema> = {
         questionId: currentQuestion.id,
@@ -66,20 +67,20 @@ const MCQ = ({ game }: Props) => {
             description: "Correct answer",
             variant: "success",
           });
-          setcorrectAnswers((prev) => prev + 1);
+          setCorrectAnswers((prev) => prev + 1);
         } else {
           toast({
             title: "Incorrect!",
             description: "Incorrect answer",
             variant: "destructive",
           });
-          setwrongAnswers((prev) => prev + 1);
+          setWrongAnswers((prev) => prev + 1);
         }
-        if (questionIndex === game.questions.length - 1) {
-          sethasEnded(true);
-          return;
+        if (questionIndex >= game.questions.length - 1) {
+          setHasEnded(true);
+        } else {
+          setQuestionIndex((prev) => prev + 1);
         }
-        setquestionIndex((prev) => prev + 1);
       },
     });
   }, [checkAnswer, toast, isChecking, game.questions.length, questionIndex]);
@@ -105,20 +106,17 @@ const MCQ = ({ game }: Props) => {
   }, [handleNext]);
 
   if (hasEnded) {
-    <div className="absolute flex flex-col justify-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-      <div className="px-4 mt-2 font-semibold-text-white bg-green-500 rounded-md whitespace-nowrap">
-        You completed in{" "}
-        {formatTimeDelta(differenceInSeconds(now, game.timeStarted))}
+    return (
+      <div className="absolute flex flex-col justify-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div className="px-4 mt-2 font-semibold text-white bg-green-500 rounded-md whitespace-nowrap">
+          You completed in {formatTimeDelta(differenceInSeconds(now, game.timeStarted))}
+        </div>
+        <Link href={`/statistics/${game.id}`} className={cn(buttonVariants(), "mt-2")}>
+          View Statistics
+          <BarChart className="w-4 h-4 ml-2" />
+        </Link>
       </div>
-
-      <Link
-        href={`/statistics/${game.id}`}
-        className={cn(buttonVariants(), "mt-2")}
-      >
-        View Statistics
-        <BarChart className="w-4 h-4 ml-2" />
-      </Link>
-    </div>;
+    );
   }
 
   return (
@@ -137,25 +135,17 @@ const MCQ = ({ game }: Props) => {
             <span>00:00</span>
           </div>
         </div>
-        <MCQCounter
-          correctAnswers={correctAnswers}
-          wrongAnswers={wrongAnswers}
-        />
+        <MCQCounter correctAnswers={correctAnswers} wrongAnswers={wrongAnswers} />
       </div>
       <Card className="w-full mt-4">
         <CardHeader className="flex flex-row items-center">
           <CardTitle className="mr-5 text-center divide-y divide-zinc-800/50">
             <div>{questionIndex + 1}</div>
-            <div className="text-base text-slate-400">
-              {game.questions.length}
-            </div>
+            <div className="text-base text-slate-400">{game.questions.length}</div>
           </CardTitle>
-          <CardDescription className="flex-grow text-lg">
-            {currentQuestion.question}
-          </CardDescription>
+          <CardDescription className="flex-grow text-lg">{currentQuestion.question}</CardDescription>
         </CardHeader>
       </Card>
-
       <div className="flex flex-col items-center justify-center w-full mt-4">
         {options.map((option, index) => (
           <Button
@@ -172,11 +162,7 @@ const MCQ = ({ game }: Props) => {
             </div>
           </Button>
         ))}
-        <Button
-          disabled={isChecking}
-          onClick={() => handleNext()}
-          className="mt-2"
-        >
+        <Button disabled={isChecking} onClick={handleNext} className="mt-2">
           {isChecking && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
           Next <ChevronRight className="w-4 h-4 ml-2" />
         </Button>

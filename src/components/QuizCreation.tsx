@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardContent,
@@ -27,10 +27,14 @@ import { Separator } from "./ui/separator";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import LoadingQuestions from "./LoadingQuestions";
+import { finished } from "stream";
 type Props = {};
 type Input = z.infer<typeof quizCreationSchema>;
 const QuizCreation = (props: Props) => {
   const router=useRouter();
+  const [showLoader,setShowLoader]=useState(false)
+  const [finished,setfinished]=useState(false)
   const { mutate: getQuestions, isPending } = useMutation({
     mutationFn: async ({ amount, topic, type }: Input) => {
       try {
@@ -55,20 +59,32 @@ const QuizCreation = (props: Props) => {
   });
   form.watch();
   const onSubmit = (input: Input) => {
+    setShowLoader(true);
     getQuestions({
       amount:input.amount,
       topic:input.topic,
       type:input.type,
     },{
       onSuccess:({gameId})=>{
-        if(form.getValues("type")=="mcq")
-          router.push(`/play/mcq/${gameId}`)
-        else
-        router.push(`/play/open-ended/${gameId}`)
+        setfinished(true);
+        setTimeout(()=>{
+          if(form.getValues("type")=="mcq")
+            router.push(`/play/mcq/${gameId}`)
+          else
+          router.push(`/play/open-ended/${gameId}`)
+        },1000)
+       
+      },
+      onError: () => {
+        setShowLoader(false)
       }
     })
 
   };
+
+  if(showLoader){
+    return <LoadingQuestions finished={finished}/>
+  }
 
   return (
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
