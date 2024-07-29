@@ -14,7 +14,7 @@ const page = async({params:{gameId}}: Props) => {
     if(!session?.user){
         return redirect("/");
     }
-    const game=await prisma?.game.findUnique({
+    const game=await prisma.game.findUnique({
         where:{id:gameId},
         include:{questions:{
             select:{
