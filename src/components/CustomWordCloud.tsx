@@ -1,27 +1,13 @@
 "use client";
 import { useTheme } from 'next-themes';
+import { useRouter } from 'next/navigation';
 import React from 'react'
 import D3WordCloud from "react-d3-cloud";
 
-type Props = {}
-const data=[
-    {
-text:"Hey",
-value:3
-},
-    {
-text:"Hi",
-value:7
-},
-    {
-text:"How",
-value:9
-},
-    {
-text:"Yup",
-value:12
-},
-]
+type Props = {
+  formattedTopics:{text:string,value:number}[]
+}
+
 
 
 const fontSizeWrapper=(word:{value:number})=>{
@@ -30,17 +16,21 @@ const fontSizeWrapper=(word:{value:number})=>{
 
 
 
-const CustomWordCloud = (props: Props) => {
-    const theme=useTheme()
+const CustomWordCloud = ({formattedTopics}: Props) => {
+    const theme=useTheme();
+    const router=useRouter();
   return (
     <>
       <D3WordCloud
       height={550}
-      data={data}
+      data={formattedTopics}
       font={"Times"}
       fontSize={fontSizeWrapper}
       rotate={0}
       padding={10}
+      onWordClick={(event:any,word:any)=>{
+        router.push(`/quiz?topic=${word.text}`)
+      }}
       fill={theme.theme =="dark"?"white":"black"}
 
       />  

@@ -36,10 +36,10 @@ const HistoryComponent = async ({ limit, userId }: Props) => {
               </Link>
               <p className="flex items-center px-2 py-1 text-sm text-white rounded-lg w-fit bg-slate-800">
                 <Clock className="w-4 h-4 mr-1" />
-                {new Date(game.timeStarted).toLocaleDateString()}
+                {new Date(game.timeStarted ?? 0) .toLocaleDateString()}
               </p>
               <p className="texxt-sm text-muted-foreground">
-                {game.gameType === "mcq" ? "MCQ" : "Open Ended"}
+                {game.gameType === "mcq" ? "Multiple Choice" : "Open Ended"}
               </p>
             </div>
           </div>
