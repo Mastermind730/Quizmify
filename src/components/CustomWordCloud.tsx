@@ -19,6 +19,7 @@ const fontSizeWrapper=(word:{value:number})=>{
 const CustomWordCloud = ({formattedTopics}: Props) => {
     const theme=useTheme();
     const router=useRouter();
+    // console.log(formattedTopics)
   return (
     <>
       <D3WordCloud
