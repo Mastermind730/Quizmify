@@ -30,7 +30,7 @@ const CustomWordCloud = ({ formattedTopics }: Props) => {
         // options={options}
         words={formattedTopics}
         callbacks={{
-          onWordClick: (word) => {
+          onWordClick: (word:any) => {
             router.push(`/quiz?topic=${word.text}`);
           }
         }}

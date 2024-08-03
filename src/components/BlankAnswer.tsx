@@ -20,7 +20,7 @@ const BlankAnswer = ({ answer,setBlankAnswer }: Props) => {
   }, [answer]);
 
   const answerWithBlanks = useMemo(() => {
-    const answerWithBlanks = keywords.reduce((acc, keyword) => {
+    const answerWithBlanks = keywords.reduce((acc:any, keyword:any) => {
       return acc.replace(keyword, BLANKS);
     }, answer);
     setBlankAnswer(answerWithBlanks);
@@ -29,7 +29,7 @@ const BlankAnswer = ({ answer,setBlankAnswer }: Props) => {
   return (
     <div className="flex justify-start w-full mt-4">
       <h1 className="text-xl font-semibold">
-        {answerWithBlanks.split(BLANKS).map((part, index) => (
+        {answerWithBlanks.split(BLANKS).map((part:any, index:any) => (
           <>
             {part}
             {index===answerWithBlanks.split(BLANKS).length-1?null:( <input
